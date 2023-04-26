@@ -191,37 +191,17 @@ int main(int argc, char * argv[])
         prev = curr;
         ROS_INFO("Sync Success!");
 
+        std_msgs::Header header;
+        // header.stamp.fromSec(dur2.count());
+        header.seq = count;
+        sensor_msgs::ImagePtr msg0 = cv_bridge::CvImage(header, "bgr8", stereo_camera.get_img(0)).toImageMsg();
+        sensor_msgs::ImagePtr msg1 = cv_bridge::CvImage(header, "bgr8", stereo_camera.get_img(1)).toImageMsg();
+        pub0.publish(msg0);
+        pub1.publish(msg1);
+        
       }
     }
-
-
-
-    
-    // curr = system_clock::now();
-    // auto dur = std::chrono::duration<double>(curr - prev);
-    // if (dur.count() >= interval) {
-    //   if (stereo_camera.sync_capture() < 0) {
-    //     ROS_INFO("Sync failed!");
-    //     return -1;
-    //   }
-    //   else 
-    //   {
-    //     auto dur2 = std::chrono::duration<double>(curr - start);
-    //     ROS_INFO("%f: %f Sync Success!", dur2.count(), dur.count());
-    //     count++;
-    //     std_msgs::Header header;
-    //     header.stamp.fromSec(dur2.count());
-    //     header.seq = count;
-    //     sensor_msgs::ImagePtr msg0 = cv_bridge::CvImage(header, "rgb8", stereo_camera.get_img(0)).toImageMsg();
-    //     sensor_msgs::ImagePtr msg1 = cv_bridge::CvImage(header, "rgb8", stereo_camera.get_img(1)).toImageMsg();
-    //     pub0.publish(msg0);
-    //     pub1.publish(msg1);
-    //     prev = curr;
-    //   }
-    // }
-    rate.sleep();
   }
-  
 
   return 0;
 }

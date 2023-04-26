@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
 )
 
-find_package(OpenCV 3.2 REQUIRED)
+find_package(OpenCV REQUIRED)
 message(STATUS "OpenCV Version: " ${OpenCV_VERSION})
 
 add_library(CwCapture SHARED IMPORTED)
