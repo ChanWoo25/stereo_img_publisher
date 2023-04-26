@@ -152,6 +152,14 @@ private:
   } stream_state;
 };
 
+  /* Set Global Base Time (cwlee) */
+  // {
+  //   auto now = std::chrono::high_resolution_clock::now();
+  //   auto epoch = now.time_since_epoch();
+  //   uint64_t value = std::chrono::duration_cast<std::chrono::nanoseconds>(epoch).count();
+  //   std::cout << "time: " << value << std::endl;
+  // }
+
 int main(int argc, char * argv[])
 {
   ros::init(argc, argv, "stereo_img_publisher");
@@ -189,10 +197,14 @@ int main(int argc, char * argv[])
       if (prev == 0 || curr - prev > u_interval)
       {
         prev = curr;
-        ROS_INFO("Sync Success!");
+        // ROS_INFO("Sync Success!");
+
+        auto now = std::chrono::high_resolution_clock::now();
+        auto epoch = now.time_since_epoch();
+        uint64_t nano_now = std::chrono::duration_cast<std::chrono::nanoseconds>(epoch).count();
 
         std_msgs::Header header;
-        // header.stamp.fromSec(dur2.count());
+        header.stamp.fromNSec(nano_now);
         header.seq = count;
         sensor_msgs::ImagePtr msg0 = cv_bridge::CvImage(header, "bgr8", stereo_camera.get_img(0)).toImageMsg();
         sensor_msgs::ImagePtr msg1 = cv_bridge::CvImage(header, "bgr8", stereo_camera.get_img(1)).toImageMsg();
