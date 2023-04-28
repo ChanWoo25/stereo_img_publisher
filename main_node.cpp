@@ -13,7 +13,7 @@
 class StereoDevice {
 public:
   StereoDevice(int format_idx, 
-               int64_t usec_sync_threshold=5000, 
+               int64_t usec_sync_threshold=8000, 
                uint32_t resized_w=0U, 
                uint32_t resized_h=0U)
     : usec_sync_threshold_(usec_sync_threshold),
@@ -88,7 +88,7 @@ public:
     while (diff >= usec_sync_threshold_
            && ++cnt <= 10)
     {
-      if (cnt > 5) {
+      if (cnt > 8) {
         ROS_INFO("Retry %d", cnt);
         ROS_INFO("dif: %ld", diff);
       }
@@ -115,7 +115,9 @@ public:
 
   cv::Mat get_img(int cam_index) {
     convert(cam_[cam_index], img_[cam_index]);
-    return cv::Mat(h_, w_, CV_8UC3, img_[cam_index]);
+    cv::Mat img = cv::Mat(h_, w_, CV_8UC3, img_[cam_index]);
+    cv::rotate(img, img, cv::ROTATE_180);
+    return img;
   }
 
   void off() 
