@@ -13,7 +13,7 @@
 class StereoDevice {
 public:
   StereoDevice(int format_idx, 
-               int64_t usec_sync_threshold=8000, 
+               int64_t usec_sync_threshold=10000, 
                uint32_t resized_w=0U, 
                uint32_t resized_h=0U)
     : usec_sync_threshold_(usec_sync_threshold),
@@ -116,7 +116,8 @@ public:
   cv::Mat get_img(int cam_index) {
     convert(cam_[cam_index], img_[cam_index]);
     cv::Mat img = cv::Mat(h_, w_, CV_8UC3, img_[cam_index]);
-    cv::rotate(img, img, cv::ROTATE_180);
+    // cv::rotate(img, img, cv::ROTATE_180);
+    cv::flip(img, img, 0);
     return img;
   }
 
@@ -168,8 +169,8 @@ int main(int argc, char * argv[])
   ros::NodeHandle nh;
   image_transport::ImageTransport it(nh);
 
-  image_transport::Publisher pub0 = it.advertise("/image0", 1);
-  image_transport::Publisher pub1 = it.advertise("/image1", 1);
+  image_transport::Publisher pub0 = it.advertise("/cam0", 1);
+  image_transport::Publisher pub1 = it.advertise("/cam1", 1);
 
   int format_option = 0;
   StereoDevice stereo_camera(format_option);
@@ -181,7 +182,7 @@ int main(int argc, char * argv[])
   // auto prev = start;
   // auto curr = start;
   ros::Rate rate(500);
-  double fps = 20.0;
+  double fps = 10.0;
   double interval = 1.0 / fps;
   auto  u_interval =  static_cast<int64_t>(interval * 1000000);
   uint32_t count = 0;
@@ -208,8 +209,8 @@ int main(int argc, char * argv[])
         std_msgs::Header header;
         header.stamp.fromNSec(nano_now);
         header.seq = count;
-        sensor_msgs::ImagePtr msg0 = cv_bridge::CvImage(header, "bgr8", stereo_camera.get_img(0)).toImageMsg();
-        sensor_msgs::ImagePtr msg1 = cv_bridge::CvImage(header, "bgr8", stereo_camera.get_img(1)).toImageMsg();
+        sensor_msgs::ImagePtr msg0 = cv_bridge::CvImage(header, "bgr8", stereo_camera.get_img(1)).toImageMsg();
+        sensor_msgs::ImagePtr msg1 = cv_bridge::CvImage(header, "bgr8", stereo_camera.get_img(0)).toImageMsg();
         pub0.publish(msg0);
         pub1.publish(msg1);
         
