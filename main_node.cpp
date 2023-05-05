@@ -182,7 +182,7 @@ int main(int argc, char * argv[])
   // auto prev = start;
   // auto curr = start;
   ros::Rate rate(500);
-  double fps = 10.0;
+  double fps = 20.0;
   double interval = 1.0 / fps;
   auto  u_interval =  static_cast<int64_t>(interval * 1000000);
   uint32_t count = 0;
