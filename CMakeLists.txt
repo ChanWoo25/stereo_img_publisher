@@ -18,9 +18,9 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(OpenCV REQUIRED)
 message(STATUS "OpenCV Version: " ${OpenCV_VERSION})
 
-add_library(CwCapture SHARED IMPORTED)
-set_target_properties(CwCapture PROPERTIES
-IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/3rd_lib/libCwCapture.so)
+add_library(capture SHARED IMPORTED)
+set_target_properties(capture PROPERTIES
+IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/CamCapture/lib/libcapture.so)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -124,19 +124,18 @@ catkin_package(
 
 add_executable(${PROJECT_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/main_node.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/stereo_img_publisher.cpp
 )
-target_include_directories(${PROJECT_NAME} 
-PUBLIC  
+target_include_directories(${PROJECT_NAME}
+PUBLIC
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/CamCapture/include
 )
-target_link_libraries(${PROJECT_NAME} 
-PRIVATE  
+target_link_libraries(${PROJECT_NAME}
+PRIVATE
   ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES} 
-  CwCapture
+  ${OpenCV_LIBRARIES}
+  capture
 )
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_14)
 set_target_properties(${PROJECT_NAME} PROPERTIES

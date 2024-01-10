@@ -8,13 +8,13 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 
-#include <CwCapture.h>
+#include <capture.h>
 
 class StereoDevice {
 public:
-  StereoDevice(int format_idx, 
-               int64_t usec_sync_threshold=10000, 
-               uint32_t resized_w=0U, 
+  StereoDevice(int format_idx,
+               int64_t usec_sync_threshold=10000,
+               uint32_t resized_w=0U,
                uint32_t resized_h=0U)
     : usec_sync_threshold_(usec_sync_threshold),
       w_(0U), h_(0U),
@@ -25,8 +25,8 @@ public:
     for (unsigned i = 0; i < 2; i++)
     {
       cam_[i] = (CaptureDevice *) std::malloc(sizeof(CaptureDevice));
-      
-      if (cam_[i] == NULL) 
+
+      if (cam_[i] == NULL)
         exit(-1);
 
       if (initialize(cam_[i], i) < 0)
@@ -53,7 +53,7 @@ public:
     img_[1] = (uint8_t *) std::malloc(sizeof(int8_t) * w_ * h_ * 3);
   }
 
-  ~StereoDevice() 
+  ~StereoDevice()
   {
     for (unsigned i = 0; i < 2; i++) {
       free_buffer(cam_[i]);
@@ -62,20 +62,20 @@ public:
     }
   }
 
-  void on() 
+  void on()
   {
     uint8_t flag = 0;
     for (unsigned i = 0; i < 2; i++)
     {
       if (stream_on(cam_[i]) < 0)
         break;
-      else 
+      else
         flag |= (1 << i);
     }
     stream_state = (flag == 0b11) ? StreamState::START : StreamState::PUASE;
   }
 
-  int sync_capture() 
+  int sync_capture()
   {
 
     capture(cam_[0]);
@@ -97,8 +97,8 @@ public:
       {
         capture(cam_[0]);
         usec_[0] = static_cast<int64_t>(cam_[0]->data.usec);
-      }  
-      else 
+      }
+      else
       {
         capture(cam_[1]);
         usec_[1] = static_cast<int64_t>(cam_[1]->data.usec);
@@ -121,14 +121,14 @@ public:
     return img;
   }
 
-  void off() 
+  void off()
   {
     uint8_t flag = 0;
     for (unsigned i = 0; i < 2; i++)
     {
       if (stream_off(cam_[i]) < 0)
         break;
-      else 
+      else
         flag |= (1 << i);
     }
     stream_state = (flag == 0b11) ? StreamState::STOP : StreamState::PUASE;
@@ -213,7 +213,7 @@ int main(int argc, char * argv[])
         sensor_msgs::ImagePtr msg1 = cv_bridge::CvImage(header, "bgr8", stereo_camera.get_img(0)).toImageMsg();
         pub0.publish(msg0);
         pub1.publish(msg1);
-        
+
       }
     }
   }
@@ -232,7 +232,7 @@ int main(int argc, char * argv[])
         ROS_INFO("Sync failed!");
         return -1;
       }
-      else 
+      else
       {
         auto dur2 = std::chrono::duration<double>(curr - start);
         ROS_INFO("%f: %f Sync Success!", dur2.count(), dur.count());
@@ -258,16 +258,16 @@ int main(int argc, char * argv[])
       sync_try_cnt_ = 0;
       return 0;
     }
-    else 
+    else
     { // When sync is over threshold, try until 5 times.
-      if (sync_try_cnt_++ < 5) 
+      if (sync_try_cnt_++ < 5)
       {
         ROS_INFO("sync retry");
         ros::Rate rate(500);
         rate.sleep();
         return sync_capture();
       }
-      else 
+      else
         return -1;
     }
 */
